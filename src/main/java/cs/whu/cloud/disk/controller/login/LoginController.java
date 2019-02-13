@@ -1,12 +1,12 @@
 package cs.whu.cloud.disk.controller.login;
 
-import javax.servlet.http.HttpSession;
-
 import cs.whu.cloud.disk.controller.BaseController;
 import cs.whu.cloud.disk.util.BaseUtils;
 import cs.whu.cloud.disk.util.Json;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpSession;
 
 
 @Controller
@@ -50,7 +50,7 @@ public class LoginController extends BaseController {
 	
 	@RequestMapping("init")
 	public String init() throws Exception {
-		/*String table_gid = "gid";
+		String table_gid = "gid";
 		String[] fam_gid = {"gid"};
 		db.createTable(table_gid, fam_gid,1);
 		
@@ -68,14 +68,14 @@ public class LoginController extends BaseController {
 		
 		db.add(table_gid, "gid", "gid", "gid", (long)0);
 		
-		long id = db.getGid();
+		long id = db.getGid("0");
 		db.add("user_id", "admin", "id", "id", id);
 		db.add("id_user", id, "user", "name", "admin");
-		db.add("id_user", id, "user", "pwd", "336393");
-		db.add("id_user", id, "user", "email", "634623907@qq.com");
-		db.add("email_user", "634623907@qq.com", "user", "userid", id);
+		db.add("id_user", id, "user", "pwd", "123");
+		db.add("id_user", id, "user", "email", "978582067@qq.com");
+		db.add("email_user", "978582067@qq.com", "user", "userid", id);
 		
-		hdfsDB.mkdir("/admin");*/
+		hdfsDB.mkdir("/admin");
 		
 		String table_follow = "follow";
 		String[] fam_follow_name = {"name"};
