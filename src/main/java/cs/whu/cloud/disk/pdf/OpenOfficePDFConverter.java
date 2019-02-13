@@ -1,14 +1,16 @@
 package cs.whu.cloud.disk.pdf;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
 import cs.whu.cloud.disk.util.FileUtils;
 import cs.whu.cloud.disk.util.SiteUrl;
+import lombok.extern.slf4j.Slf4j;
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
 import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
+@Slf4j
 public class OpenOfficePDFConverter implements PDFConverter{
     
     private static  OfficeManager officeManager;
@@ -27,6 +29,7 @@ public class OpenOfficePDFConverter implements PDFConverter{
                     inputFile = odtFile;
                 } catch (FileNotFoundException e) {
                     //System.out.println("文档不存在！");
+                    log.warn("文档{}不存在！",inputFile);
                     e.printStackTrace();
                 }
             }

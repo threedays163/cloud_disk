@@ -50,6 +50,7 @@ public class HbaseDB  implements Serializable{
 	public static HbaseDB getInstance() {
 		return HbaseDBInstance.instance;
 	}
+
 	private HbaseDB() {
 		Configuration conf = HBaseConfiguration.create();
 		conf.set("hbase.zookeeper.quorum", SiteUrl.readUrl("host"));
@@ -61,9 +62,9 @@ public class HbaseDB  implements Serializable{
 		}
 	}
 	
-	private Object readResolve(){
+	/*private Object readResolve(){
 		return getInstance();
-	}
+	}*/
 	/**
 	 * 获取所有表
 	 * @return
@@ -100,6 +101,7 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void createTable(String tableName,String[] fams,int version) throws Exception {
 //		HBaseAdmin admin = new HBaseAdmin(connection);
+		getInstance();
 		Admin admin = connection.getAdmin();
 		TableName tn = TableName.valueOf(tableName);
 		if (admin.tableExists(tn)) {
