@@ -80,7 +80,7 @@ public class LoginController extends BaseController {
 		db.add("id_user", id, "user", "email", "978582067@qq.com");
 		db.add("email_user", "978582067@qq.com", "user", "userid", id);
 		
-		hdfsDB.mkdir("/admin");
+		//hdfsDB.mkdir("/admin");
 		
 		String table_follow = "follow";
 		String[] fam_follow_name = {"name"};

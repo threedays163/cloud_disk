@@ -9,7 +9,7 @@ spring:
       prefix:
       suffix: .jsp
   profiles:
-    active: dev
+    active: prod
     include:
 server:
   tomcat:
