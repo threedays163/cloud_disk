@@ -13,6 +13,11 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/")
 public class LoginController extends BaseController {
 
+	/*@RequestMapping("index")
+	public String index(){
+		return "index";
+	}*/
+
 	@RequestMapping("login")
 	public String login(String userName,String pwd,HttpSession session) throws Exception {
 		long userId = db.checkUser(userName, pwd);

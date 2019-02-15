@@ -1,7 +1,5 @@
 package cs.whu.cloud.disk.controller.sys;
 
-import javax.servlet.http.HttpSession;
-
 import cs.whu.cloud.disk.controller.BaseController;
 import cs.whu.cloud.disk.util.BaseUtils;
 import cs.whu.cloud.disk.util.Json;
@@ -9,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/user")
@@ -67,7 +67,7 @@ public class UserController extends BaseController {
 		if (name!=null) {
 			model.addAttribute("follows", db.getFollow(name));
 		}
-		return "cloud/follow";
+		return "/cloud/follow";
 	}
 	@RequestMapping("/getFollow")
 	public String getFollow(String ids,String dir,String types,HttpSession session,Model model) throws Exception {
@@ -78,7 +78,7 @@ public class UserController extends BaseController {
 		model.addAttribute("dir", dir);
 		model.addAttribute("ids", ids);
 		model.addAttribute("types", types);
-		return "cloud/share_getfollow";
+		return "/cloud/share_getfollow";
 	}
 	/**
 	 * 关注用户

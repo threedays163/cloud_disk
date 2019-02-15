@@ -1,5 +1,5 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
-<%@ include file="/public/taglib.jsp" %>
+<%@ include file="public/taglib.jsp" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -8,10 +8,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <html>
   <head><base href="<%=basePath%>">
     <title>云盘首页</title>
-    <jsp:include page="/public/pub.jsp"></jsp:include>
+    <jsp:include page="public/pub.jsp"></jsp:include>
 	</head>
 	<body>
-		<jsp:include page="/public/top.jsp"></jsp:include>
+		<jsp:include page="public/top.jsp"></jsp:include>
 		
 		<div class="main-container" id="main-container">
 			<script type="text/javascript">
@@ -23,7 +23,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<span class="menu-text"></span>
 				</a>
 
-				<jsp:include page="/public/left.jsp"></jsp:include>
+				<jsp:include page="public/left.jsp"></jsp:include>
 				
 				<div class="main-content">
 					<div class="breadcrumbs" id="breadcrumbs">
@@ -74,7 +74,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					</div><!-- /.page-content -->
 				</div><!-- /.main-content -->
 				
-				<jsp:include page="/public/container.jsp"></jsp:include>
+				<jsp:include page="public/container.jsp"></jsp:include>
 			</div><!-- /.main-container-inner -->
 
 			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">

@@ -1,0 +1,17 @@
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  mvc:
+    view:
+      prefix:
+      suffix: .jsp
+  profiles:
+    active: dev
+    include:
+server:
+  tomcat:
+    basedir: logs
+  port: 8081

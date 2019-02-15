@@ -1,14 +1,5 @@
 package cs.whu.cloud.disk.controller.cloud;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import cs.whu.cloud.disk.controller.BaseController;
 import cs.whu.cloud.disk.util.*;
 import cs.whu.cloud.disk.vo.FileSystemVo;
@@ -20,6 +11,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -222,7 +221,7 @@ public class CloudController extends BaseController {
 		File outFile = new File(swfFile);
 		if(outFile.exists()){
 			model.addAttribute("local", "test/"+name.substring(0,name.lastIndexOf("."))+".swf");
-			return "cloud/view";
+			return "/cloud/view";
 		}
 		String pdfFile = FileUtils.getFilePrefix(local+"\\"+name)+".pdf";
 		File outFile01 = new File(pdfFile);
@@ -233,7 +232,7 @@ public class CloudController extends BaseController {
 			OfficeToSwf.pdftoswf(pdfFile);
 		}
 		model.addAttribute("local", "test/"+name.substring(0,name.lastIndexOf("."))+".swf");
-		return "cloud/view";
+		return "/cloud/view";
 	}
 	@RequestMapping("/download")
 	public String download(String dir,String name,HttpServletRequest request,Model model) throws Exception {
@@ -243,7 +242,7 @@ public class CloudController extends BaseController {
 			hdfsDB.downLoad(dir+"/"+name, local+"\\"+name);
 		}
 		model.addAttribute("name", name);
-		return "cloud/down";
+		return "/cloud/down";
 	}
 	/**
 	 * 分享
@@ -288,11 +287,11 @@ public class CloudController extends BaseController {
 	@RequestMapping("/getshare")
 	public String getshare(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
-		if (name==null) {
+/*		if (name==null) {
 			return null;
 		}
-		model.addAttribute("shares", db.getshare(name));
-		return "cloud/share";
+		model.addAttribute("shares", db.getshare(name));*/
+		return "/cloud/share";
 	}
 	/**
 	 * 获取被分享
@@ -303,12 +302,12 @@ public class CloudController extends BaseController {
 	 */
 	@RequestMapping("/getshareed")
 	public String getshareed(HttpSession session,Model model) throws Exception {
-		String name = (String) session.getAttribute("username");
+		/*String name = (String) session.getAttribute("username");
 		if (name==null) {
 			return null;
 		}
-		model.addAttribute("shares", db.getshareed(name));
-		return "cloud/shareed";
+		model.addAttribute("shares", db.getshareed(name));*/
+		return "/cloud/shareed";
 	}
 	/**
 	 * 查询被分享
@@ -328,7 +327,7 @@ public class CloudController extends BaseController {
 		List<FileSystemVo> list = hdfsDB.queryAll(dir);
 		model.addAttribute("shares", list);
 		model.addAttribute("dir", dir);
-		return "cloud/shareed_list";
+		return "/cloud/shareed_list";
 	}
 	/**
 	 * 记事本列表
@@ -340,11 +339,11 @@ public class CloudController extends BaseController {
 	@RequestMapping("/booklist")
 	public String booklist(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
-		if (name==null) {
+		/*if (name==null) {
 			return null;
-		}
-		model.addAttribute("books", db.listbook(name));
-		return "cloud/book";
+		}*/
+		//model.addAttribute("books", db.listbook(name));
+		return "/cloud/book";
 	}
 	/**
 	 * 新增记事本
