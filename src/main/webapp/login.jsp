@@ -58,7 +58,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 										<div class="space-6"></div>
 
-										<form action="login.do" method="post">
+										<form action="login" method="post">
 											<fieldset>
 												<label class="block clearfix"> <span
 													class="block input-icon input-icon-right"> <input
@@ -159,7 +159,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 											<i class="icon-group blue"></i> 注册用户
 										</h4>
 
-										<form action="reg.do" method="post">
+										<form action="reg" method="post">
 											<fieldset>
 												<label class="block clearfix"> <span
 													class="block input-icon input-icon-right"> <input
