@@ -58,7 +58,7 @@ public class LoginController extends BaseController {
 	@RequestMapping("reg")
 	public String reg(String email,String username,String password) throws Exception {
 		if(BaseUtils.isNotEmpty(email) && BaseUtils.isNotEmpty(username) && BaseUtils.isNotEmpty(password)){
-			long id = db.getGid("gid");
+			long id = db.getGid("id_user");
 			db.add("user_id", username, "id", "id", id);
 			db.add("id_user", id, "user", "name", username);
 			db.add("id_user", id, "user", "pwd", password);

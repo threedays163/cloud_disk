@@ -61,7 +61,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<div class="col-xs-12">
 
 							<!-- PAGE CONTENT BEGINS -->
-							<form action="cloud/shareedList.do" method="post">
+							<%--<form action="cloud/shareedList.do" method="post">--%>
 							<input type="hidden" name="path"/>
 							<table id="sample-table-1" class="table table-striped table-bordered table-hover">
 								<thead>
@@ -95,8 +95,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 										</tr>
 									</c:forEach>
 								</tbody>
-							</table>
-							</form>
+							</table><%--</form>--%>
+
 							<!-- PAGE CONTENT ENDS -->
 						</div>
 						<!-- /.col -->
@@ -115,6 +115,24 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	</div>
 	<!-- /.main-container -->
 <script type="text/javascript">
+
+			function viewName(index,name){
+				var dir = $("#dir").val();
+				$.layer({
+					type: 2,
+					border: [0],
+					title: false,
+					closeBtn: [0, true],
+					iframe: {src : 'cloud/view.do?dir='+dir+'&name='+name},
+					area: ['950px', '650px']
+				});
+			}
+
+            function editName(index){
+                $("#edit01"+index).hide();
+                $("#edit02"+index).show();
+            }
+
 			jQuery(function($) {
 				$('#tasks').sortable({
 					opacity:0.8,
@@ -126,8 +144,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					stop: function( event, ui ) {//just for Chrome!!!! so that dropdowns on items don't appear below other items after being moved
 						$(ui.item).css('z-index', 'auto');
 					}
-					}
-				);
+                });
 				$('#tasks').disableSelection();
 				$('#tasks input:checkbox').removeAttr('checked').on('click', function(){
 					if(this.checked) $(this).closest('li').addClass('selected');

@@ -35,7 +35,7 @@ public class UserController extends BaseController {
 			return json;
 		}
 		try {
-			long id = db.getGid("gid");
+			long id = db.getGid("id_user");
 			//创建用户
 			db.add("user_id", userName, "id", "id", id);
 			db.add("id_user", id, "user", "name", userName);

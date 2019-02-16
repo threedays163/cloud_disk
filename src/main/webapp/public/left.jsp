@@ -58,8 +58,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</a></li>
 			<li><a href="/cloud/getshareed"> <i class="icon-calendar"></i> <span class="menu-text"> 收到分享</span>
 			</a></li>
-			<li><a href="/cloud/booklist"> <i class="icon-calendar"></i> <span class="menu-text"> 记事本</span>
-			</a></li>
+			<%--<li><a href="/cloud/booklist"> <i class="icon-calendar"></i> <span class="menu-text"> 记事本</span>
+			</a></li>--%>
 
 		</ul>
 		<!-- /.nav-list -->
