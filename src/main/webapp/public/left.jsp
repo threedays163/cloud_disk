@@ -48,7 +48,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<li><a href="/index.jsp"> <i class="icon-dashboard"></i> <span class="menu-text"> 欢迎页面 </span>
 			</a></li>
 
-			<li><a href="/cloud/list.jsp"> <i class="icon-text-width"></i> <span class="menu-text"> 我的网盘 </span>
+			<li><a href="/cloud/list"> <i class="icon-text-width"></i> <span class="menu-text"> 我的网盘 </span>
 			</a></li>
 
 			<li><a href="/user/followlist"> <i class="icon-list-alt"></i> <span class="menu-text"> 关注用户 </span>

@@ -4,6 +4,8 @@ import cs.whu.cloud.disk.controller.BaseController;
 import cs.whu.cloud.disk.util.*;
 import cs.whu.cloud.disk.vo.FileSystemVo;
 import cs.whu.cloud.disk.vo.Menu;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,17 +23,24 @@ import java.util.List;
 import java.util.Map;
 
 
+@Slf4j
 @Controller
 @RequestMapping("/cloud")
 public class CloudController extends BaseController {
 
 	@RequestMapping("/list")
 	public String list(String name,HttpSession session,Model model) throws Exception {
-		if (!BaseUtils.isNotEmpty(name)) {
-			name = (String) session.getAttribute("username");
-			name = "/"+name;
+		String userName = (String) session.getAttribute("username");
+		if(StringUtils.isEmpty(userName)){
+			return LOGIN_URL;
 		}
-//		model.addAttribute("fs", db.getFile(name));
+
+		if (StringUtils.isEmpty(name)) {
+			name = "/"+userName;
+		}else{
+			name=FileUtils.getStandardPath("/"+name);
+		}
+		//model.addAttribute("fs", db.getFile(name));
 		model.addAttribute("fs", hdfsDB.queryAll(name));
 		model.addAttribute("dir", name);
 		model.addAttribute("url", BaseUtils.getUrl(name));
@@ -47,8 +56,12 @@ public class CloudController extends BaseController {
 	@RequestMapping("/mkdir")
 	public Json mkdir(String mkdir, String dirName, HttpSession session) {
 		Json json = new Json();
-		if(!BaseUtils.isNotEmpty(mkdir)){
+		/*if(!BaseUtils.isNotEmpty(mkdir)){
 			json.setMsg("空值无效");
+			return json;
+		}*/
+		if(StringUtils.isEmpty(dirName)){
+			json.setMsg("文件夹名字不能为空");
 			return json;
 		}
 		String name = (String) session.getAttribute("username");
@@ -57,18 +70,16 @@ public class CloudController extends BaseController {
 			return json;
 		}
 		try {
-			String dir = null;
-			if (BaseUtils.isNotEmpty(dirName)) {
-				dir = dirName;
-			}else {
-				dir = "/"+name;
-			}
+			String dir = split+dirName;;
 			//在该用户下创建目录
-			hdfsDB.mkdir(dir+"/"+mkdir);
+			if(hdfsDB.checkExists(dir)){
+				hdfsDB.mkdir(dir+split+mkdir);
+			}
+
 			/*long id = db.getGid();
 			db.add("filesystem", id, "files", "name", mkdir);
 			db.add("filesystem", id, "files", "dir", dir);
-			db.add("filesystem", id, "files", "pdir", dir.substring(0, dir.lastIndexOf("/")));
+			db.add("filesystem", id, "files", "pdir", dir.substring(0, dir.lastIndexOf(split)));
 			db.add("filesystem", id, "files", "type", "D");*/
 			
 			FileSystemVo fs = new FileSystemVo();
@@ -104,26 +115,34 @@ public class CloudController extends BaseController {
 			json.setMsg("用户已注销，请重新登陆");
 			return json;
 		}
-		if(dir.equals("root")){
-			dir = "/"+name;
+		//获取用户目录
+		if(StringUtils.isEmpty(dir)){
+			dir = FileUtils.getStandardPath(split+name);
+		}else{
+			dir = FileUtils.getStandardPath(split+dir);
 		}
+
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(request.getServletContext());
 		if (multipartResolver.isMultipart(request)) {
 			MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 			Map<String, MultipartFile> fms = multipartRequest.getFileMap();
 			for (Map.Entry<String, MultipartFile> entity : fms.entrySet()) {
 				MultipartFile mf = entity.getValue();
-				//System.out.println(mf.getSize());
 				InputStream in = mf.getInputStream();
-				hdfsDB.upload(in, dir+"/"+mf.getOriginalFilename());
-//				long id = db.getGid();
-//				db.add("filesystem", id, "files", "name", mf.getOriginalFilename());
-//				db.add("filesystem", id, "files", "dir", dir);
-//				db.add("filesystem", id, "files", "pdir", dir.substring(0, dir.lastIndexOf("/")));
-//				db.add("filesystem", id, "files", "type", "F");
-//				db.add("filesystem", id, "files", "size", BaseUtils.FormetFileSize(mf.getSize()));
+				String destination=dir+ split+mf.getOriginalFilename();
+				hdfsDB.upload(in, destination);
+				long id = db.getGid("filesystem");
+				db.add("filesystem", id, "files", "name", mf.getOriginalFilename());
+				db.add("filesystem", id, "files", "dir", dir);
+				/*System.out.println(dir);
+				System.out.println(dir.substring(0, dir.lastIndexOf(split)));*/
+				db.add("filesystem", id, "files", "pdir", dir.substring(0, dir.lastIndexOf(split)));
+				db.add("filesystem", id, "files", "type", "F");
+				db.add("filesystem", id, "files", "size", BaseUtils.FormetFileSize(mf.getSize()));
+
 				in.close();
 				json.setSuccess(true);
+				log.info("用户:{}，上传文件:\"{}\"到\"{}\"成功,文件大小:{}kb",name,mf.getOriginalFilename(),destination,mf.getSize()*1.0/1024);
 			}
 		}
 		return json;
@@ -142,7 +161,7 @@ public class CloudController extends BaseController {
 		try {
 			String[] ns = ids.split(",");
 			for (int i = 0; i < ns.length; i++) {
-				hdfsDB.delete(dir+"/"+ns[i]);
+				hdfsDB.delete(dir+split+ns[i]);
 			}
 			json.setSuccess(true);
 			json.setMsg("删除成功");
@@ -165,7 +184,7 @@ public class CloudController extends BaseController {
 		Json json = new Json();
 		String[] ns = ids.split(",");
 		for (int i = 0; i < ns.length; i++) {
-			ns[i] = dir+"/"+ns[i];
+			ns[i] = dir+split+ns[i];
 		}
 		try {
 			hdfsDB.copy(ns, dst, flag);
@@ -192,9 +211,9 @@ public class CloudController extends BaseController {
 		Json json = new Json();
 		try {
 			if(type.equals("F")){
-				hdfsDB.rename(dir+"/"+name, dir+"/"+rename+name.substring(name.lastIndexOf(".")));
+				hdfsDB.rename(dir+split+name, dir+split+rename+name.substring(name.lastIndexOf(".")));
 			}else if (type.equals("D")) {
-				hdfsDB.rename(dir+"/"+name, dir+"/"+rename);
+				hdfsDB.rename(dir+split+name, dir+split+rename);
 			}
 			json.setSuccess(true);
 			json.setMsg("重命名成功");
@@ -226,7 +245,7 @@ public class CloudController extends BaseController {
 		String pdfFile = FileUtils.getFilePrefix(local+"\\"+name)+".pdf";
 		File outFile01 = new File(pdfFile);
 		if(!outFile01.exists()){
-			hdfsDB.downLoad(dir+"/"+name, local+"\\"+name);
+			hdfsDB.downLoad(dir+split+name, local+"\\"+name);
 			OfficeToSwf.convert2PDF(local+"\\"+name);
 		}else{
 			OfficeToSwf.pdftoswf(pdfFile);
@@ -239,7 +258,7 @@ public class CloudController extends BaseController {
 		String local = request.getServletContext().getRealPath("/test");
 		File f = new File(local+"\\"+name);
 		if (!f.exists()) {
-			hdfsDB.downLoad(dir+"/"+name, local+"\\"+name);
+			hdfsDB.downLoad(dir+split+name, local+File.separator+name);
 		}
 		model.addAttribute("name", name);
 		return "/cloud/down";
@@ -262,6 +281,14 @@ public class CloudController extends BaseController {
 			json.setMsg("用户已注销，请重新登陆");
 			return json;
 		}
+		if(StringUtils.isEmpty(names)||StringUtils.isEmpty(usernames)){
+		    if(StringUtils.isEmpty(names)){
+                json.setMsg("请选择要分享的文件！");
+            }else{
+                json.setMsg("请选择要分享的用户！");
+            }
+		    return json;
+        }
 		String[] n = names.split(",");
 		String[] t = types.split(",");
 		String[] u = usernames.split(",");
@@ -287,10 +314,10 @@ public class CloudController extends BaseController {
 	@RequestMapping("/getshare")
 	public String getshare(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
-/*		if (name==null) {
-			return null;
+		if (name==null) {
+			return LOGIN_URL;
 		}
-		model.addAttribute("shares", db.getshare(name));*/
+		model.addAttribute("shares", db.getshare(name));
 		return "/cloud/share";
 	}
 	/**
@@ -302,11 +329,11 @@ public class CloudController extends BaseController {
 	 */
 	@RequestMapping("/getshareed")
 	public String getshareed(HttpSession session,Model model) throws Exception {
-		/*String name = (String) session.getAttribute("username");
+		String name = (String) session.getAttribute("username");
 		if (name==null) {
-			return null;
+			return LOGIN_URL;
 		}
-		model.addAttribute("shares", db.getshareed(name));*/
+		model.addAttribute("shares", db.getshareed(name));
 		return "/cloud/shareed";
 	}
 	/**
@@ -322,7 +349,7 @@ public class CloudController extends BaseController {
 		if (dir==null) {
 			dir=path;
 		}else{
-			dir=dir+"/"+path;
+			dir=dir+split+path;
 		}
 		List<FileSystemVo> list = hdfsDB.queryAll(dir);
 		model.addAttribute("shares", list);
@@ -339,10 +366,10 @@ public class CloudController extends BaseController {
 	@RequestMapping("/booklist")
 	public String booklist(HttpSession session,Model model) throws Exception {
 		String name = (String) session.getAttribute("username");
-		/*if (name==null) {
-			return null;
-		}*/
-		//model.addAttribute("books", db.listbook(name));
+		if (name==null) {
+			return LOGIN_URL;
+		}
+		model.addAttribute("books", db.listbook(name));
 		return "/cloud/book";
 	}
 	/**
@@ -381,7 +408,7 @@ public class CloudController extends BaseController {
 			if (name==null) {
 				return null;
 			}
-			menus = hdfsDB.tree("/"+name);
+			menus = hdfsDB.tree(split+name);
 		}
 		return menus;
 	}

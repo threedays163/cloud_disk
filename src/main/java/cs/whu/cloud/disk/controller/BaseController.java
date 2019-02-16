@@ -5,8 +5,12 @@ import cs.whu.cloud.disk.db.HdfsDB;
 
 public class BaseController {
 
-	public HbaseDB db = HbaseDB.getInstance();
-	public HdfsDB hdfsDB = HdfsDB.getInstance();
-	//public HbaseDB db = null;
-	//public HdfsDB hdfsDB = null;
+	public static String LOGIN_URL="redirect:/login.jsp";//"";
+
+	public static String split="/";
+
+	//public static HbaseDB db = HbaseDB.getInstance();
+	//public static HdfsDB hdfsDB = HdfsDB.getInstance();
+	public static HbaseDB db = null;
+	public static HdfsDB hdfsDB = null;
 }

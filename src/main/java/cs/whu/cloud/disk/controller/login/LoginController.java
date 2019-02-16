@@ -3,12 +3,17 @@ package cs.whu.cloud.disk.controller.login;
 import cs.whu.cloud.disk.controller.BaseController;
 import cs.whu.cloud.disk.util.BaseUtils;
 import cs.whu.cloud.disk.util.Json;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 
 
+@Slf4j
 @Controller
 @RequestMapping("/")
 public class LoginController extends BaseController {
@@ -36,7 +41,18 @@ public class LoginController extends BaseController {
 		if (session!=null) {
 			session.invalidate();
 		}
-		return "redirect:login.jsp";
+		return LOGIN_URL;
+	}
+
+	@PostMapping("checkLogin")
+	@ResponseBody
+	public String checkLogin(HttpSession session){
+		String name=(String)session.getAttribute("username");
+		if(StringUtils.isEmpty(name)){
+			return "notLogin";
+		}else{
+			return name;
+		}
 	}
 	
 	@RequestMapping("reg")
@@ -50,7 +66,7 @@ public class LoginController extends BaseController {
 			db.add("email_user", email, "user", "userid", id);
 			hdfsDB.mkdir("/"+username);
 		}
-		return "redirect:login.jsp";
+		return LOGIN_URL;
 	}
 	
 	@RequestMapping("init")
@@ -73,14 +89,14 @@ public class LoginController extends BaseController {
 		
 		db.add(table_gid, "gid", "gid", "gid", (long)0);
 		
-		long id = db.getGid("0");
+		long id = db.getGid("id_user");
 		db.add("user_id", "admin", "id", "id", id);
 		db.add("id_user", id, "user", "name", "admin");
 		db.add("id_user", id, "user", "pwd", "123");
 		db.add("id_user", id, "user", "email", "978582067@qq.com");
 		db.add("email_user", "978582067@qq.com", "user", "userid", id);
-		
-		//hdfsDB.mkdir("/admin");
+
+		hdfsDB.mkdir("/admin");
 		
 		String table_follow = "follow";
 		String[] fam_follow_name = {"name"};
@@ -116,7 +132,11 @@ public class LoginController extends BaseController {
 		String table_book = "book";
 		String[] fam_book_content = {"content"};
 		db.createTable(table_book, fam_book_content,1);
+
+		String fileSystem="filesystem";
+		String[] fam_fileSystem={"files"};
+		db.createTable(fileSystem, fam_fileSystem, 1);
 		
-		return "redirect:login.jsp";
+		return LOGIN_URL;
 	}
 }

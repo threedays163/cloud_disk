@@ -1,5 +1,7 @@
 package cs.whu.cloud.disk.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,6 +41,15 @@ public class FileUtils {
 			}
         } 
 	}
+
+	public static String getStandardPath(String path){
+		if(StringUtils.isEmpty(path)){
+			return "";
+		}else{
+			return path.replaceAll("[/\\\\]+", "/");
+		}
+	}
+
 	public static void main(String[] args) {
 		String s ="dsdsdsd.rar";
 		System.out.println(getFileSufix(s));

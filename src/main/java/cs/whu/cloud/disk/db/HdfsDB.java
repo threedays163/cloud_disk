@@ -1,14 +1,6 @@
 package cs.whu.cloud.disk.db;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import cs.whu.cloud.disk.config.IConstant;
 import cs.whu.cloud.disk.util.BaseUtils;
 import cs.whu.cloud.disk.util.DateUtil;
 import cs.whu.cloud.disk.util.FileUtils;
@@ -16,18 +8,19 @@ import cs.whu.cloud.disk.util.SiteUrl;
 import cs.whu.cloud.disk.vo.FileSystemVo;
 import cs.whu.cloud.disk.vo.Menu;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Progressable;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HdfsDB {
 
 	private static String[] suf = {"csv","txt","doc","docx","xls","xlsx","ppt","pptx"};
-	private static final String ROOT = "/";
+	private static final String ROOT = IConstant.ROOT;
 	static FileSystem fs;
 	static Configuration conf;
 
@@ -73,7 +66,7 @@ public class HdfsDB {
 	 * @throws Exception
 	 */
 	public void upload(InputStream in, String dir) throws Exception {
-		OutputStream out = fs.create(new Path(dir), new Progressable() {
+		OutputStream out = fs.create(new Path(ROOT + dir), new Progressable() {
 			@Override
 			public void progress() {
 				//System.out.println("ok");
@@ -88,7 +81,7 @@ public class HdfsDB {
 	 * @throws Exception
 	 */
 	public void downLoad(String path,String local) throws Exception {
-		FSDataInputStream in = fs.open(new Path(path));
+		FSDataInputStream in = fs.open(new Path(ROOT+path));
 		OutputStream out = new FileOutputStream(local);
 		IOUtils.copyBytes(in, out, 4096, true);
 	}
@@ -99,7 +92,7 @@ public class HdfsDB {
 	 * @throws Exception
 	 */
 	public void rename(String src,String dst) throws Exception {
-		fs.rename(new Path(src), new Path(dst));
+		fs.rename(new Path(ROOT+src), new Path(ROOT+dst));
 	}
 
 	/**
@@ -108,8 +101,8 @@ public class HdfsDB {
 	 * @throws Exception
 	 */
 	public void mkdir(String dir) throws Exception {
-		if (!fs.exists(new Path(dir))) {
-			fs.mkdirs(new Path(dir));
+		if (!fs.exists(new Path(ROOT+dir))) {
+			fs.mkdirs(new Path(ROOT+dir));
 		}
 	}
 	/**
@@ -118,7 +111,7 @@ public class HdfsDB {
 	 * @throws Exception
 	 */
 	public void delete(String name) throws Exception {
-		fs.delete(new Path(name), true);
+		fs.delete(new Path(ROOT+name), true);
 	}
 
 	/**
@@ -128,7 +121,7 @@ public class HdfsDB {
 	 * @throws Exception
 	 */
 	public List<FileSystemVo> queryAll(String dir) throws Exception {
-		FileStatus[] files = fs.listStatus(new Path(dir));
+		FileStatus[] files = fs.listStatus(new Path(ROOT+dir));
 		List<FileSystemVo> fileVos = new ArrayList<FileSystemVo>();
 		FileSystemVo f = null;
 		for (int i = 0; i < files.length; i++) {
@@ -166,13 +159,23 @@ public class HdfsDB {
 	public void copy(String[] path, String dst,boolean src) throws Exception {
 		Path[] paths = new Path[path.length];
 		for (int i = 0; i < path.length; i++) {
-			paths[i]=new Path(path[i]);
+			paths[i]=new Path(ROOT+path[i]);
 		}
 		FileUtil.copy(fs, paths, fs, new Path(dst), src, true, conf);
 	}
 	
 	public List<Menu> tree(String dir) throws Exception {
-		FileStatus[] files = fs.listStatus(new Path(dir));
+		if(dir==null){
+			return null;
+		}
+		Path path=null;
+		if(dir.startsWith("hdfs")==false){
+			path=new Path(ROOT+dir);
+		}else{
+			path=new Path(dir);
+		}
+
+		FileStatus[] files = fs.listStatus(path);
 		List<Menu> menus = new ArrayList<Menu>();
 		for (int i = 0; i < files.length; i++) {
 			if (files[i].isDirectory()) {
@@ -180,6 +183,15 @@ public class HdfsDB {
 			}
 		}
 		return menus;
+	}
+
+	public boolean checkExists(String path){
+		try {
+			return fs.exists(new Path(ROOT+path));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

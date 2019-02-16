@@ -224,10 +224,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								   $.layer({
 									    type: 2,
 									    border: [0],
-									    title: '复制到',
+									    title: flag==false?'复制到':"移动到",
 									    closeBtn: [0, true],
 									    iframe: {src : 'cloud/tree.jsp?dir='+dir+'&ids='+ids+'&flag='+flag},
-									    area: ['200px', '300px']
+									    area: ['200px', '300px'],
+									   	end: function () {
+                                            window.parent.location.reload(); //刷新父页面
+                                            //var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                            //parent.layer.close(index);  // 关闭layer
+                                        }
 									});
 							   }else{
 								   alert("你没有选择");

@@ -1,13 +1,5 @@
 package cs.whu.cloud.disk.db;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import cs.whu.cloud.disk.util.DateUtil;
 import cs.whu.cloud.disk.util.SiteUrl;
 import cs.whu.cloud.disk.vo.FileSystemVo;
@@ -15,28 +7,18 @@ import cs.whu.cloud.disk.vo.Menu;
 import cs.whu.cloud.disk.vo.ShareVo;
 import cs.whu.cloud.disk.vo.bookVo;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Admin;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.Delete;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.*;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.QualifierFilter;
 import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.util.Bytes;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
 
 
 public class HbaseDB  implements Serializable{
@@ -101,7 +83,6 @@ public class HbaseDB  implements Serializable{
 	 */
 	public static void createTable(String tableName,String[] fams,int version) throws Exception {
 //		HBaseAdmin admin = new HBaseAdmin(connection);
-		getInstance();
 		Admin admin = connection.getAdmin();
 		TableName tn = TableName.valueOf(tableName);
 		if (admin.tableExists(tn)) {

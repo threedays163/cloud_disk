@@ -28,7 +28,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 //var dir = eval('${param.dir}');
 // Convert divs to queue widgets when the DOM is ready
 $(function() {
- 
+    $.post("${pageContext.request.contextPath}/checkLogin",function(data) {
+        if (data=="notLogin"){
+            top.location="${pageContext.request.contextPath}/login.jsp";
+            //window.location.href="${pageContext.request.contextPath}/login.jsp";
+        }
+    });
     $("#uploader").pluploadQueue({
         // General settings
         runtimes : 'html5,flash,silverlight,html4',
@@ -150,7 +155,7 @@ $(function() {
             FileUploaded: function(up, file, info) {
                 // Called when file has finished uploading
                // log('[FileUploaded] File:', file, "Info:", info);
-            	//console.info(info);
+            	console.info(info);
             },
   
             ChunkUploaded: function(up, file, info) {
@@ -158,11 +163,14 @@ $(function() {
                // log('[ChunkUploaded] File:', file, "Info:", info);
             },
  
-            UploadComplete: function(up, files) {
+            UploadComplete: function(up, files, info) {
                 // Called when all files are either uploaded or failed
                //console.info(up);
-               //console.info(files);
-               // log('[UploadComplete]');
+                console.info(files);
+                console.info(info);
+                window.parent.location.reload(); //刷新父页面
+                var index = parent.pluploadQueue.getFrameIndex(window.name); //获取窗口索引
+                parent.pluploadQueue.close(index);  // 关闭
             },
  
             Destroy: function(up) {
@@ -172,8 +180,7 @@ $(function() {
   
             Error: function(up, args) {
                 // Called when error occurs
-                 //console.info(args);
-                //log('[Error] ', args);
+                console.error(args);
             }
         }
     });
